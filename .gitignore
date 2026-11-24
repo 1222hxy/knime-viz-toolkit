@@ -33,6 +33,7 @@ htmlcov/
 # Rendered demo outputs & temporary artifacts
 output/
 outputs/
+examples/_*_output/
 _tmp_*/
 *.tmp
 .DS_Store

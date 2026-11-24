@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "knime-viz-toolkit": {
+      "command": "knime-viz-mcp",
+      "args": []
+    }
+  }
+}
