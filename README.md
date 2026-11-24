@@ -7,7 +7,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0F9D8A?style=flat-square)](LICENSE)
 [![Zero KNIME / Java](https://img.shields.io/badge/runtime-Pure%20Python%20(No%20KNIME%20%2F%20Java)-1B365D?style=flat-square)](#architecture)
-[![MCP Ready](https://img.shields.io/badge/AI%20Agent-MCP%20%7C%20OpenAI%20%7C%20Anthropic-6D5BD0?style=flat-square)](#ai-agent--mcp-integration)
+[![MCP Ready](https://img.shields.io/badge/AI%20Agent-MCP%20%7C%20WorkBuddy%20%7C%20Qwen%20%7C%20DeepSeek%20%7C%20OpenAI-6D5BD0?style=flat-square)](#ai-agent--mcp-integration)
 
 **English** | [简体中文 (ZH)](README.zh-CN.md)
 
@@ -162,9 +162,11 @@ See [examples/quickstart_python.py](examples/quickstart_python.py) for a complet
 
 ## AI Agent & MCP Integration
 
-### Option A: Native MCP Server (Claude Desktop / Cursor / Antigravity)
+Works out of the box with both desktop AI assistants (**WorkBuddy**, **Cherry Studio**, **Cursor**, **Trae**, **Claude Desktop**, **Antigravity**) and LLM APIs (**Qwen / 通义千问**, **DeepSeek**, **Kimi**, **OpenAI**, **Gemini**, **Anthropic Claude**).
 
-Add the following to your MCP client configuration (see [examples/mcp_client_config.json](examples/mcp_client_config.json)):
+### Option A: Zero-Code MCP Setup (WorkBuddy / Cherry Studio / Cursor / Trae / Claude Desktop / Antigravity)
+
+Add the following to your client's **MCP Servers** configuration (see [examples/mcp_client_config.json](examples/mcp_client_config.json)):
 
 ```json
 {
@@ -177,31 +179,41 @@ Add the following to your MCP client configuration (see [examples/mcp_client_con
 }
 ```
 
-### Option B: OpenAI / Gemini / DeepSeek / Anthropic Function Calling
+Once connected, you can simply chat in plain language — no Python needed:
+> *"Inspect my `workflow_EXECUTED.knwf`, re-render all charts in `dark_transparent` theme for my dark PPT slides into `./ppt_charts`, and add a correlation bar chart for node #4."*
+
+*(Tip: Even without configuring MCP, terminal-capable agents such as **WorkBuddy**, **Trae**, **Cursor**, or **Claude Code** can directly run `knime-viz inspect ... --json` and `knime-viz render ...`.)*
+
+### Option B: Qwen (通义千问) / DeepSeek / Kimi / OpenAI / Anthropic Function Calling
+
+Because **Qwen (DashScope / 通义千问)**, **DeepSeek**, **Kimi**, and **Doubao (豆包)** all support the OpenAI-compatible tool-calling format, `toolkit.get_openai_tools()` works directly with all of them:
 
 ```python
+from openai import OpenAI
 from knime_viz_toolkit import KnimeVizAgentToolkit
 
+# Example: Qwen (Alibaba Cloud DashScope) — swap base_url/model for DeepSeek, Kimi, or OpenAI
+client = OpenAI(
+    api_key="YOUR_DASHSCOPE_API_KEY",
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
 toolkit = KnimeVizAgentToolkit(cache_workflows=True)
 
-# Export JSON Schemas for your LLM SDK
-openai_tools = toolkit.get_openai_tools()
-anthropic_tools = toolkit.get_anthropic_tools()
+# Export JSON Schemas for Qwen / DeepSeek / OpenAI / Gemini (or get_anthropic_tools() for Claude)
+tools = toolkit.get_openai_tools()
 
-# Dispatch tool calls returned by the model
-result = toolkit.call_tool(
-    "render_node_chart",
-    {
-        "workflow_path": "Bike_Sharing_Master_Workflow_EXECUTED.knwf",
-        "node_id": 13,
-        "output_path": "out/scatter_dark.png",
-        "theme": "dark_transparent",
-        "include_base64": True,  # Optional base64 PNG for multimodal visual review
-    },
+resp = client.chat.completions.create(
+    model="qwen-plus",
+    messages=[{"role": "user", "content": "Render workflow_EXECUTED.knwf in dark_transparent theme."}],
+    tools=tools,
 )
+
+# Dispatch any tool_call returned by the model
+for tc in resp.choices[0].message.tool_calls or []:
+    result_json = toolkit.call_tool_json(tc.function.name, tc.function.arguments)
 ```
 
-See [examples/agent_tool_calling_demo.py](examples/agent_tool_calling_demo.py) for an end-to-end autonomous agent workflow.
+See [examples/qwen_deepseek_agent_demo.py](examples/qwen_deepseek_agent_demo.py) (Qwen / DeepSeek) and [examples/agent_tool_calling_demo.py](examples/agent_tool_calling_demo.py) (local tool-calling loop) for runnable scripts.
 
 ### Exposed Agent Tools (8)
 

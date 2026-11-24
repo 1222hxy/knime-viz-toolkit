@@ -7,7 +7,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-0F9D8A?style=flat-square)](LICENSE)
 [![Zero KNIME / Java](https://img.shields.io/badge/runtime-Pure%20Python%20(零%20KNIME%20%2F%20Java)-1B365D?style=flat-square)](#架构设计)
-[![MCP Ready](https://img.shields.io/badge/AI%20Agent-MCP%20%7C%20OpenAI%20%7C%20Anthropic-6D5BD0?style=flat-square)](#ai-agent-与-mcp-集成)
+[![MCP Ready](https://img.shields.io/badge/AI%20Agent-MCP%20%7C%20WorkBuddy%20%7C%20通义千问%20%7C%20DeepSeek-6D5BD0?style=flat-square)](#ai-agent-与-mcp-集成)
 
 [English](README.md) | **简体中文 (ZH)**
 
@@ -162,9 +162,13 @@ with KnimeWorkflow("Bike_Sharing_Master_Workflow_EXECUTED.knwf") as wf:
 
 ## AI Agent 与 MCP 集成
 
-### 方式 A：原生 MCP Server（Claude Desktop / Cursor / Antigravity）
+全面兼容同学日常最常用的 AI 工具与国产大模型：
+- **桌面端 / IDE AI 助手（MCP 零代码接入）**：**腾讯 WorkBuddy**、**Cherry Studio**、**Cursor**、**Trae**、**Claude Desktop**、**Antigravity**
+- **大模型 API（Function Calling 接入）**：**通义千问（Qwen / 阿里云百炼）**、**DeepSeek**、**Kimi**、**豆包（火山方舟）**、**OpenAI**、**Gemini**、**Claude**
 
-参考 [examples/mcp_client_config.json](examples/mcp_client_config.json)，将以下配置添加到你的 MCP 客户端：
+### 方式 A：不会写代码也能用 —— 在 WorkBuddy / Cherry Studio / Cursor / Trae 中配置 MCP
+
+在软件的 **MCP 服务器设置** 中粘贴以下配置（对应文件：[examples/mcp_client_config.json](examples/mcp_client_config.json)）：
 
 ```json
 {
@@ -177,31 +181,44 @@ with KnimeWorkflow("Bike_Sharing_Master_Workflow_EXECUTED.knwf") as wf:
 }
 ```
 
-### 方式 B：OpenAI / Gemini / DeepSeek / Anthropic Function Calling
+配置完成后，直接在聊天框里用中文提需求即可（全程零代码）：
+> **示例提示词：**
+> “帮我读取 `Bike_Sharing_Master_Workflow_EXECUTED.knwf`，把里面所有图表和模型对比图都用 `dark_transparent`（透明底深色 PPT 主题）高清导出到 `./ppt_charts`，顺便帮我看看节点 #4 还能补画一张什么相关性分析图。”
+
+> **小提示**：像 **WorkBuddy、Trae、Cursor、Claude Code** 这类支持终端命令的 Agent，即使不配 MCP，也可以直接让它调用 `knime-viz render ...` 或 `knime-viz inspect ... --json` 完成同样操作！
+
+### 方式 B：接入通义千问（Qwen）/ DeepSeek / Kimi / 豆包 API
+
+通义千问（阿里云百炼 DashScope）、DeepSeek、Kimi、豆包均原生兼容 OpenAI Function Calling 协议，直接调用 `toolkit.get_openai_tools()` 即可无缝对接：
 
 ```python
+from openai import OpenAI
 from knime_viz_toolkit import KnimeVizAgentToolkit
 
+# 以通义千问（阿里云百炼）为例；换成 DeepSeek 只需改 base_url 和 model
+client = OpenAI(
+    api_key="你的_DASHSCOPE_API_KEY",
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
 toolkit = KnimeVizAgentToolkit(cache_workflows=True)
 
-# 导出标准工具声明 Schema
-openai_tools = toolkit.get_openai_tools()
-anthropic_tools = toolkit.get_anthropic_tools()
+# 导出工具声明（通义千问 / DeepSeek / Kimi / OpenAI 通用；Claude 用 get_anthropic_tools()）
+tools = toolkit.get_openai_tools()
 
-# 模型返回 tool_call 后直接调度执行
-result = toolkit.call_tool(
-    "render_node_chart",
-    {
-        "workflow_path": "Bike_Sharing_Master_Workflow_EXECUTED.knwf",
-        "node_id": 13,
-        "output_path": "out/scatter_dark.png",
-        "theme": "dark_transparent",
-        "include_base64": True,  # 可选：返回 base64 PNG 供多模态模型视觉自检
-    },
+resp = client.chat.completions.create(
+    model="qwen-plus",
+    messages=[{"role": "user", "content": "把 workflow_EXECUTED.knwf 用透明底深色 PPT 风格批量出图"}],
+    tools=tools,
 )
+
+# 自动调度模型返回的工具调用
+for tc in resp.choices[0].message.tool_calls or []:
+    result_json = toolkit.call_tool_json(tc.function.name, tc.function.arguments)
 ```
 
-完整 Agent 调用演示见 [examples/agent_tool_calling_demo.py](examples/agent_tool_calling_demo.py)。
+完整可运行示例见：
+- 通义千问 / DeepSeek 接入脚本：[examples/qwen_deepseek_agent_demo.py](examples/qwen_deepseek_agent_demo.py)
+- 本地 Agent 工具调度演示：[examples/agent_tool_calling_demo.py](examples/agent_tool_calling_demo.py)
 
 ### 内置 8 个 Agent 工具
 
