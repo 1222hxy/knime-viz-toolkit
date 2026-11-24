@@ -19,6 +19,21 @@
 
 ---
 
+## One-Sentence Install for AI Agents
+
+Copy and send this single prompt to **WorkBuddy, Cursor, Trae, Claude Code, Qwen, Cherry Studio, or Antigravity** — your AI Agent will install the toolkit, wire up MCP/CLI, and render your `.knwf` charts automatically:
+
+```text
+Please install knime-viz-toolkit from https://github.com/1222hxy/knime-viz-toolkit.git (pip install "git+https://github.com/1222hxy/knime-viz-toolkit.git[mcp]"), then inspect my executed KNIME workflow (.knwf) using `knime-viz` and render all charts in `dark_transparent` (or `editorial`) 300-DPI theme.
+```
+
+> **One-liner for terminal users:**
+> ```bash
+> pip install "git+https://github.com/1222hxy/knime-viz-toolkit.git"
+> ```
+
+---
+
 ## Why KNIME Viz Toolkit?
 
 KNIME Analytics Platform is great for building transparent visual data-science pipelines, yet its default chart exports often look dated, low-DPI, or inconsistent across slides and academic papers.
@@ -98,11 +113,12 @@ flowchart LR
 ## Installation
 
 ```bash
-git clone <your-repo-url>
-cd knime-viz-toolkit
-pip install -e .
+# Quick install directly from GitHub
+pip install "git+https://github.com/1222hxy/knime-viz-toolkit.git"
 
-# Optional: enable native MCP server support
+# Or clone locally for development / MCP support
+git clone https://github.com/1222hxy/knime-viz-toolkit.git
+cd knime-viz-toolkit
 pip install -e ".[mcp]"
 ```
 

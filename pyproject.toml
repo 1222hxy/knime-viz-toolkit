@@ -43,5 +43,10 @@ dev = [
 knime-viz = "knime_viz_toolkit.cli:main"
 knime-viz-mcp = "knime_viz_toolkit.agent.mcp_server:main"
 
+[project.urls]
+Homepage = "https://github.com/1222hxy/knime-viz-toolkit"
+Repository = "https://github.com/1222hxy/knime-viz-toolkit"
+Issues = "https://github.com/1222hxy/knime-viz-toolkit/issues"
+
 [tool.setuptools.packages.find]
 where = ["src"]

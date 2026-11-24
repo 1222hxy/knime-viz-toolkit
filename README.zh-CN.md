@@ -19,6 +19,21 @@
 
 ---
 
+## 发给 AI Agent 的一句话安装（零基础直接复制）
+
+把下面这句话直接发给 **腾讯 WorkBuddy、Cursor、Trae、通义千问、Cherry Studio、Claude Code 或 Antigravity**，AI 会自动帮你装好工具包并读取 `.knwf` 生成高清图表：
+
+```text
+请帮我从 https://github.com/1222hxy/knime-viz-toolkit.git 安装 knime-viz-toolkit（执行 pip install "git+https://github.com/1222hxy/knime-viz-toolkit.git[mcp]"），然后用 `knime-viz` 读取我当前文件夹里的已执行 KNIME 工作流（.knwf），把所有节点图和模型对比图按 `dark_transparent`（透明底深色 PPT）和 `editorial`（出版风）300 DPI 高清导出。
+```
+
+> **终端一行极速安装：**
+> ```bash
+> pip install "git+https://github.com/1222hxy/knime-viz-toolkit.git"
+> ```
+
+---
+
 ## 为什么做这个工具包？
 
 在数据科学课程项目与团队协作中，KNIME 非常适合可视化搭建透明的数据分析流水线，但 KNIME 原生导出的图表往往分辨率偏低、样式陈旧、难以直接放进高质量汇报 PPT 或学术论文。
@@ -98,11 +113,12 @@ flowchart LR
 ## 快速安装
 
 ```bash
-git clone <你的仓库地址>
-cd knime-viz-toolkit
-pip install -e .
+# 直接从 GitHub 一行安装
+pip install "git+https://github.com/1222hxy/knime-viz-toolkit.git"
 
-# 可选：启用 MCP Server 支持（如环境未安装 mcp）
+# 或克隆到本地开发安装（含 MCP 支持）
+git clone https://github.com/1222hxy/knime-viz-toolkit.git
+cd knime-viz-toolkit
 pip install -e ".[mcp]"
 ```
 
