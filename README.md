@@ -13,11 +13,12 @@
 - **零 KNIME / 零 Java / 零 pandas 依赖**：纯 Python 原生解码 KNIME 二进制表格式（`DefaultTableStoreFormat` / `container_12`、Xerial Snappy / GZIP 压缩、`rearrange_columns_table`、`wrapped_table`、`new_spec_table`、`concatenate_table`、`joined_table` 等）。
 - **自动读取 KNIME 图表节点并高清重绘**：自动识别 KNIME 工作流中的所有可视化节点、`settings.xml` 轴配置、聚合方式、节点批注和 `Color Manager` 配色，自动优化配色、字体（自动兼容中英文防乱码）、网格线、趋势线/移动平均线、数值标签、千分位与防重叠排版。
 - **自动合成建模诊断图**：自动读取 `Numeric Scorer` 生成多模型指标对比图（R² / MAE / RMSE）、读取 `k-Means` 生成聚类分布双联图、读取 `Predictor` 节点生成实际值 vs 预测值 + 残差诊断图。
-- **内置 5 套出版级主题**：
+- **内置 6 套出版级主题**：
   - `editorial`：咨询/出版风（深海军蓝 + 青绿 + 珊瑚红 + 琥珀黄）
   - `academic`：极简学术/课程汇报风（钢蓝 + 暖红 + 森林绿，清爽无杂物）
   - `nature`：科研期刊风（Okabe-Ito 色盲友好调色板）
-  - `presentation_dark`：深色大屏 PPT 主题
+  - `presentation_dark`：深色大屏 PPT 主题（深午夜蓝灰底色 + 高对比亮色系）
+  - `dark_transparent`：**透明底深色 PPT 专用主题**（纯透明 RGBA 背景 + 亮白文字 + 半透明网格 + 磨砂图例，直接拖入任意深色/渐变 PPT 无违和感）
   - `knime_enhanced`：保留上游 KNIME `Color Manager` 配色，同时升级为 300 DPI 现代排版
 - **多形态 AI Agent 接口**：
   1. **原生 MCP Server**（`knime-viz-mcp` / `knime-viz mcp`）：直接接入 Claude Desktop、Cursor、Antigravity 等支持 Model Context Protocol 的 AI 客户端。

@@ -26,6 +26,7 @@ ThemeName = Literal[
     "academic",
     "nature",
     "presentation_dark",
+    "dark_transparent",
     "knime_enhanced",
 ]
 
@@ -145,7 +146,7 @@ class RenderOptions(BaseModel):
     y_label_override: str | None = None
     show_values_override: bool | None = None
     palette_override: list[str] | None = None
-    transparent: bool = False
+    transparent: bool | None = None  # None = inherit theme.default_transparent
 
 
 class RenderResult(BaseModel):

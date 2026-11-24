@@ -35,6 +35,10 @@ class ThemeConfig:
     legend_bg: str
     legend_edge: str
     heatmap_cmap: str
+    is_dark: bool = False
+    default_transparent: bool = False
+    marker_edge: str = "#FFFFFF"
+    wedge_edge: str = "#FFFFFF"
     prefer_donut: bool = False
     prefer_jitter_box: bool = True
     prefer_trendline: bool = True
@@ -139,6 +143,39 @@ THEMES: dict[ThemeName, ThemeConfig] = {
         legend_bg="#1E293B",
         legend_edge="#475569",
         heatmap_cmap="magma",
+        is_dark=True,
+        default_transparent=False,
+        marker_edge="#1E293B",
+        wedge_edge="#0F172A",
+        prefer_donut=True,
+        prefer_jitter_box=True,
+        prefer_trendline=True,
+        prefer_rolling_ma=True,
+    ),
+    "dark_transparent": ThemeConfig(
+        name="dark_transparent",
+        description="Transparent-background dark PPT theme with crisp white typography, translucent gridlines, and luminous series for dark slides.",
+        palette=["#38BDF8", "#34D399", "#FB7185", "#FBBF24", "#A78BFA", "#2DD4BF", "#F472B6", "#E2E8F0"],
+        primary="#38BDF8",
+        accent="#34D399",
+        negative="#FB7185",
+        neutral="#CBD5E1",
+        bg="none",
+        axes_bg="none",
+        text="#F1F5F9",
+        title_color="#FFFFFF",
+        subtitle_color="#CBD5E1",
+        spine_color="#94A3B8",
+        grid_color="#94A3B8",
+        grid_linestyle="--",
+        grid_alpha=0.28,
+        legend_bg="#0F172A",
+        legend_edge="#64748B",
+        heatmap_cmap="magma",
+        is_dark=True,
+        default_transparent=True,
+        marker_edge="none",
+        wedge_edge="#0F172A",
         prefer_donut=True,
         prefer_jitter_box=True,
         prefer_trendline=True,
@@ -217,15 +254,23 @@ def get_theme(name: ThemeName | str) -> ThemeConfig:
     return THEMES[key]  # type: ignore[index]
 
 
-def build_rc_params(theme: ThemeConfig, dpi: int = 300, prefer_cjk: bool = False) -> dict[str, Any]:
+def build_rc_params(
+    theme: ThemeConfig,
+    dpi: int = 300,
+    prefer_cjk: bool = False,
+    transparent: bool | None = None,
+) -> dict[str, Any]:
     """Return a matplotlib rcParams dictionary scoped for `mpl.rc_context`."""
+    is_trans = theme.default_transparent if transparent is None else transparent
+    fig_bg = "none" if is_trans else theme.bg
+    ax_bg = "none" if is_trans else theme.axes_bg
     rc: dict[str, Any] = {
         "font.family": "sans-serif",
         "font.sans-serif": detect_font_stack(prefer_cjk=prefer_cjk),
         "axes.unicode_minus": False,
-        "figure.facecolor": theme.bg,
-        "axes.facecolor": theme.axes_bg,
-        "savefig.facecolor": theme.bg,
+        "figure.facecolor": fig_bg,
+        "axes.facecolor": ax_bg,
+        "savefig.facecolor": fig_bg,
         "savefig.dpi": dpi,
         "axes.edgecolor": theme.spine_color,
         "axes.linewidth": 0.9,
@@ -242,6 +287,7 @@ def build_rc_params(theme: ThemeConfig, dpi: int = 300, prefer_cjk: bool = False
         "legend.frameon": True,
         "legend.facecolor": theme.legend_bg,
         "legend.edgecolor": theme.legend_edge,
+        "legend.framealpha": 0.72 if is_trans and theme.is_dark else 0.94,
         "legend.fontsize": 9.0,
     }
     rc.update(theme.rc_overrides)
@@ -254,7 +300,9 @@ def list_themes_info() -> list[dict[str, Any]]:
             "name": t.name,
             "description": t.description,
             "palette": t.palette,
-            "background": t.bg,
+            "background": "transparent" if t.default_transparent else t.bg,
+            "is_dark": t.is_dark,
+            "default_transparent": t.default_transparent,
             "heatmap_cmap": t.heatmap_cmap,
         }
         for t in THEMES.values()

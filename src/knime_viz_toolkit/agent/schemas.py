@@ -40,7 +40,7 @@ class RenderNodeChartInput(BaseModel):
     output_path: str = Field(description="Destination file path for the rendered image (e.g., 'out/chart.png').")
     theme: ThemeName = Field(
         default="editorial",
-        description="Visual theme: 'editorial', 'academic', 'nature', 'presentation_dark', or 'knime_enhanced'.",
+        description="Visual theme: 'editorial', 'academic', 'nature', 'presentation_dark', 'dark_transparent', or 'knime_enhanced'.",
     )
     fmt: Literal["png", "svg", "pdf"] = Field(default="png", description="Output file format.")
     dpi: int = Field(default=300, ge=72, le=600, description="Output resolution in DPI.")

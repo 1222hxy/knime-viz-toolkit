@@ -272,8 +272,8 @@ def _render_line(spec: ChartSpec, table: KnimeTable, theme: ThemeConfig, opts: R
                 linestyle=ls,
                 marker=mk,
                 markersize=4.5 if mk else 0,
-                markeredgecolor=theme.axes_bg,
-                markeredgewidth=0.6,
+                markeredgecolor=theme.marker_edge,
+                markeredgewidth=0.6 if theme.marker_edge != "none" else 0.0,
                 label=lbl,
             )
 
@@ -354,8 +354,8 @@ def _render_scatter(spec: ChartSpec, table: KnimeTable, theme: ThemeConfig, opts
                     color=col,
                     alpha=0.62,
                     s=pt_size,
-                    edgecolors=theme.axes_bg,
-                    linewidths=0.35,
+                    edgecolors=theme.marker_edge,
+                    linewidths=0.35 if theme.marker_edge != "none" else 0.0,
                     label=f"{color_col} = {c_val}" if len(c_val) <= 3 else c_val,
                 )
                 # Subtle quadratic trend curve if enhanced & group has enough spread (non-cluster)
@@ -385,15 +385,15 @@ def _render_scatter(spec: ChartSpec, table: KnimeTable, theme: ThemeConfig, opts
                 cmap=theme.heatmap_cmap,
                 alpha=0.68,
                 s=pt_size,
-                edgecolors=theme.axes_bg,
-                linewidths=0.3,
+                edgecolors=theme.marker_edge,
+                linewidths=0.3 if theme.marker_edge != "none" else 0.0,
             )
             cbar = fig.colorbar(sc, ax=ax, pad=0.02, fraction=0.046)
             cbar.set_label(color_col, fontsize=9.2, color=theme.text)
     else:
         col = opts.palette_override[0] if opts.palette_override else theme.primary
         sx, sy = x_arr[idx_all], y_arr[idx_all]
-        ax.scatter(sx, sy, color=col, alpha=0.60, s=pt_size, edgecolors=theme.axes_bg, linewidths=0.35)
+        ax.scatter(sx, sy, color=col, alpha=0.65, s=pt_size, edgecolors=theme.marker_edge, linewidths=0.35 if theme.marker_edge != "none" else 0.0)
         if opts.enhance and theme.prefer_trendline and len(sx) >= 25 and np.std(sx) > 1e-9:
             try:
                 xs = np.linspace(float(np.min(sx)), float(np.max(sx)), 160)
@@ -464,7 +464,7 @@ def _render_box(spec: ChartSpec, table: KnimeTable, theme: ThemeConfig, opts: Re
         widths=0.46,
         patch_artist=True,
         showfliers=not show_jitter,
-        medianprops=dict(color="#FFFFFF" if theme.name != "presentation_dark" else "#0F172A", linewidth=2.0),
+        medianprops=dict(color="#0F172A" if theme.is_dark else "#FFFFFF", linewidth=2.0),
         whiskerprops=dict(color=theme.neutral, linewidth=1.2),
         capprops=dict(color=theme.neutral, linewidth=1.2),
         flierprops=dict(marker="o", markersize=3.2, alpha=0.45, markeredgecolor=theme.neutral),
@@ -615,7 +615,7 @@ def _render_pie(spec: ChartSpec, table: KnimeTable, theme: ThemeConfig, opts: Re
     fig, ax = plt.subplots(figsize=figsize)
     title, subtitle, _, _ = _apply_overrides(spec, opts)
 
-    wedgeprops: dict[str, Any] = dict(edgecolor=theme.bg, linewidth=2.2)
+    wedgeprops: dict[str, Any] = dict(edgecolor=theme.wedge_edge, linewidth=2.0)
     if is_donut:
         wedgeprops["width"] = 0.40
 
@@ -684,7 +684,7 @@ def _render_scatter_matrix(spec: ChartSpec, table: KnimeTable, theme: ThemeConfi
             valid = np.isfinite(xi) & np.isfinite(yj)
             if i == j:
                 vals = xi[np.isfinite(xi)]
-                ax.hist(vals, bins=18, color=theme.primary, alpha=0.78, edgecolor=theme.bg, linewidth=0.5)
+                ax.hist(vals, bins=18, color=theme.primary, alpha=0.80, edgecolor=theme.wedge_edge, linewidth=0.5)
                 style_axes(ax, theme, grid_axis="none")
             elif i > j:
                 ax.scatter(xi[valid], yj[valid], s=9, alpha=0.45, color=theme.accent, edgecolors="none")
@@ -733,7 +733,7 @@ def _render_histogram(spec: ChartSpec, table: KnimeTable, theme: ThemeConfig, op
     title, subtitle, xlabel, ylabel = _apply_overrides(spec, opts)
 
     col = opts.palette_override[0] if opts.palette_override else theme.primary
-    ax.hist(vals, bins="auto", color=col, alpha=0.84, edgecolor=theme.bg, linewidth=0.7)
+    ax.hist(vals, bins="auto", color=col, alpha=0.84, edgecolor=theme.wedge_edge, linewidth=0.7)
     if opts.enhance and len(vals) > 0:
         m = float(np.mean(vals))
         med = float(np.median(vals))
@@ -884,7 +884,7 @@ def _render_kmeans_regimes(spec: ChartSpec, table: KnimeTable, theme: ThemeConfi
         mask = np.array([c == cid_str for c in c_raw]) & np.isfinite(x_arr) & np.isfinite(y_arr)
         sx, sy = x_arr[mask], y_arr[mask]
         counts.append(int(np.sum(mask)))
-        ax1.scatter(sx, sy, color=col, alpha=0.60, s=24, edgecolors=theme.axes_bg, linewidths=0.35, label=cid_str)
+        ax1.scatter(sx, sy, color=col, alpha=0.62, s=24, edgecolors=theme.marker_edge, linewidths=0.35 if theme.marker_edge != "none" else 0.0, label=cid_str)
         # Plot centroid in table space (mean of cluster points ensures exact scale match even if normalized)
         if len(sx) > 0:
             ax1.scatter([float(np.mean(sx))], [float(np.mean(sy))], marker="*", s=210, color=col,
@@ -976,7 +976,7 @@ def _render_predictor_diagnostics(spec: ChartSpec, table: KnimeTable, theme: The
     apply_numeric_formatter(ax1, "y", sy)
     style_axes(ax1, theme, grid_axis="both")
 
-    ax2.hist(residuals, bins=32, color=theme.accent, alpha=0.84, edgecolor=theme.bg, linewidth=0.5)
+    ax2.hist(residuals, bins=32, color=theme.accent, alpha=0.84, edgecolor=theme.wedge_edge, linewidth=0.5)
     ax2.axvline(0.0, color=theme.negative, linestyle="--", linewidth=1.8, label="Zero Error")
     ax2.set_xlabel(f"Residual (Actual − Predicted)")
     ax2.set_ylabel("Count")
@@ -1030,7 +1030,8 @@ def render_chart_spec(
                 text_probe.extend(str(v) for v in table[col][:30] if v is not None)
     prefer_cjk = any(contains_cjk(t) for t in text_probe)
 
-    with mpl.rc_context(build_rc_params(theme, dpi=opts.dpi, prefer_cjk=prefer_cjk)):
+    is_transparent = theme.default_transparent if opts.transparent is None else opts.transparent
+    with mpl.rc_context(build_rc_params(theme, dpi=opts.dpi, prefer_cjk=prefer_cjk, transparent=is_transparent)):
         if spec.chart_kind == "bar":
             assert table is not None
             fig, rows, warns = _render_bar(spec, table, theme, opts)
@@ -1075,8 +1076,8 @@ def render_chart_spec(
             format=opts.fmt,
             bbox_inches="tight",
             pad_inches=0.18,
-            transparent=opts.transparent,
-            facecolor="none" if opts.transparent else theme.bg,
+            transparent=is_transparent,
+            facecolor="none" if is_transparent else theme.bg,
         )
         w_px, h_px = _get_image_dimensions(out, opts.fmt, fig, opts.dpi)
         plt.close(fig)

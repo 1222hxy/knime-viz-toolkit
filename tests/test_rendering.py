@@ -37,9 +37,14 @@ class TestRendering(unittest.TestCase):
     def test_themes_and_vector_formats(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
-            for theme in ("editorial", "academic", "nature", "presentation_dark", "knime_enhanced"):
+            for theme in ("editorial", "academic", "nature", "presentation_dark", "dark_transparent", "knime_enhanced"):
                 res = render_node(MASTER_KNWF, 13, tmp_path / f"s_{theme}.png", theme=theme, dpi=120)
                 self.assertTrue(Path(res.output_path).exists())
+            # Verify dark_transparent actually produces an RGBA PNG with transparent background
+            from PIL import Image
+            with Image.open(tmp_path / "s_dark_transparent.png") as im:
+                self.assertEqual(im.mode, "RGBA")
+                self.assertEqual(im.getpixel((0, 0))[3], 0)
             svg_res = render_node(MASTER_KNWF, 11, tmp_path / "bar.svg", theme="nature", fmt="svg")
             self.assertTrue(Path(svg_res.output_path).read_text(encoding="utf-8").startswith("<?xml"))
             pdf_res = render_node(MASTER_KNWF, 22, tmp_path / "pie.pdf", theme="academic", fmt="pdf")
