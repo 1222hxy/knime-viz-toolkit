@@ -17,6 +17,7 @@ from ..io.table import KnimeTable, smart_sort_key
 from ..io.workflow_reader import KnimeWorkflow
 from ..models import ChartSpec, RenderOptions, RenderResult
 from .helpers import (
+    add_watermark,
     apply_numeric_formatter,
     contrast_text_color,
     format_number,
@@ -1069,6 +1070,9 @@ def render_chart_spec(
             fig, rows, warns = _render_predictor_diagnostics(spec, table, theme, opts)
         else:
             raise NotImplementedError(f"Unsupported chart_kind: {spec.chart_kind}")
+
+        if opts.watermark:
+            add_watermark(fig, theme, text=opts.watermark_text)
 
         fig.savefig(
             out,

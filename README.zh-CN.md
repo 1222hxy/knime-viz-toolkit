@@ -146,6 +146,9 @@ knime-viz render-node path/to/workflow_EXECUTED.knwf 13 -o ./temp_vs_demand.svg 
 # 从任意数据节点（#4）自由生图（即使 KNIME 中未连接图表节点！）
 knime-viz custom path/to/workflow_EXECUTED.knwf 4 --kind correlation --value cnt -o ./correlations.png --theme editorial
 
+# 关闭右下角 GitHub 徽标与项目水印（Python / MCP 中传 watermark=False）
+knime-viz render path/to/workflow_EXECUTED.knwf -o ./out_clean --theme academic --no-watermark
+
 # 供命令行 AI Agent 使用的结构化 JSON 输出模式
 knime-viz inspect path/to/workflow_EXECUTED.knwf --json
 ```

@@ -147,6 +147,8 @@ class RenderOptions(BaseModel):
     show_values_override: bool | None = None
     palette_override: list[str] | None = None
     transparent: bool | None = None  # None = inherit theme.default_transparent
+    watermark: bool = True
+    watermark_text: str = "1222hxy/knime-viz-toolkit"
 
 
 class RenderResult(BaseModel):

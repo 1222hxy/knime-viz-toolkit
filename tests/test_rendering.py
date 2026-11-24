@@ -46,7 +46,12 @@ class TestRendering(unittest.TestCase):
                 self.assertEqual(im.mode, "RGBA")
                 self.assertEqual(im.getpixel((0, 0))[3], 0)
             svg_res = render_node(MASTER_KNWF, 11, tmp_path / "bar.svg", theme="nature", fmt="svg")
-            self.assertTrue(Path(svg_res.output_path).read_text(encoding="utf-8").startswith("<?xml"))
+            svg_txt = Path(svg_res.output_path).read_text(encoding="utf-8")
+            self.assertTrue(svg_txt.startswith("<?xml"))
+            self.assertIn("1222hxy/knime-viz-toolkit", svg_txt)
+            # Verify watermark can be cleanly disabled via watermark=False
+            svg_no_wm = render_node(MASTER_KNWF, 11, tmp_path / "bar_nowm.svg", theme="nature", fmt="svg", watermark=False)
+            self.assertNotIn("1222hxy/knime-viz-toolkit", Path(svg_no_wm.output_path).read_text(encoding="utf-8"))
             pdf_res = render_node(MASTER_KNWF, 22, tmp_path / "pie.pdf", theme="academic", fmt="pdf")
             self.assertTrue(Path(pdf_res.output_path).read_bytes().startswith(b"%PDF"))
 

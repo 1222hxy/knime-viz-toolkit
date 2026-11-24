@@ -52,6 +52,7 @@ class RenderNodeChartInput(BaseModel):
     subtitle_override: str | None = Field(default=None, description="Optional custom subtitle.")
     x_label_override: str | None = Field(default=None, description="Optional custom x-axis label.")
     y_label_override: str | None = Field(default=None, description="Optional custom y-axis label.")
+    watermark: bool = Field(default=True, description="Show subtle GitHub footer watermark (set False to disable).")
     include_base64: bool = Field(
         default=False,
         description="If true and fmt='png', include a base64-encoded PNG string for multimodal AI visual inspection.",
@@ -65,6 +66,7 @@ class RenderWorkflowChartsInput(BaseModel):
     fmt: Literal["png", "svg", "pdf"] = Field(default="png", description="Output image format.")
     dpi: int = Field(default=300, ge=72, le=600, description="Output DPI.")
     enhance: bool = Field(default=True, description="Enable publication-grade enhancements.")
+    watermark: bool = Field(default=True, description="Show subtle GitHub footer watermark (set False to disable).")
     include_analytics: bool = Field(
         default=True,
         description="Also render auto-synthesized analytics charts (model comparison, k-Means, predictor diagnostics).",
@@ -99,6 +101,7 @@ class RenderCustomChartInput(BaseModel):
     fmt: Literal["png", "svg", "pdf"] = Field(default="png", description="Output image format.")
     dpi: int = Field(default=300, ge=72, le=600, description="Output DPI.")
     enhance: bool = Field(default=True, description="Enable publication enhancements.")
+    watermark: bool = Field(default=True, description="Show subtle GitHub footer watermark (set False to disable).")
     include_base64: bool = Field(default=False, description="Include base64 PNG in result for visual inspection.")
 
 

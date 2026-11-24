@@ -119,6 +119,7 @@ def cmd_suggest(workflow_path: str, node_id: int, as_json: bool) -> None:
 @click.option("--format", "fmt", default="png", show_default=True, type=click.Choice(["png", "svg", "pdf"]))
 @click.option("--dpi", default=300, show_default=True, type=int)
 @click.option("--no-enhance", is_flag=True, help="Disable trendlines, moving averages, and auto value labels.")
+@click.option("--no-watermark", is_flag=True, help="Disable the subtle bottom-right GitHub footer watermark.")
 @click.option("--no-analytics", is_flag=True, help="Only render explicit KNIME visualization nodes.")
 @click.option("--nodes", "node_ids_str", default=None, help="Comma-separated node IDs to render (e.g. '10,11,13').")
 @click.option("--json", "as_json", is_flag=True, help="Output structured JSON.")
@@ -129,6 +130,7 @@ def cmd_render(
     fmt: str,
     dpi: int,
     no_enhance: bool,
+    no_watermark: bool,
     no_analytics: bool,
     node_ids_str: str | None,
     as_json: bool,
@@ -145,6 +147,7 @@ def cmd_render(
             "fmt": fmt,
             "dpi": dpi,
             "enhance": not no_enhance,
+            "watermark": not no_watermark,
             "include_analytics": not no_analytics,
             "node_ids": node_ids,
         },
@@ -169,6 +172,7 @@ def cmd_render(
 @click.option("--dpi", default=300, show_default=True, type=int)
 @click.option("--title", "title_override", default=None, help="Override chart title.")
 @click.option("--no-enhance", is_flag=True, help="Disable enhancements.")
+@click.option("--no-watermark", is_flag=True, help="Disable the bottom-right GitHub footer watermark.")
 @click.option("--json", "as_json", is_flag=True, help="Output structured JSON.")
 def cmd_render_node(
     workflow_path: str,
@@ -179,6 +183,7 @@ def cmd_render_node(
     dpi: int,
     title_override: str | None,
     no_enhance: bool,
+    no_watermark: bool,
     as_json: bool,
 ) -> None:
     """Render a single KNIME visualization or analytics node."""
@@ -193,6 +198,7 @@ def cmd_render_node(
             "fmt": fmt,
             "dpi": dpi,
             "enhance": not no_enhance,
+            "watermark": not no_watermark,
             "title_override": title_override,
         },
     )
@@ -218,6 +224,7 @@ def cmd_render_node(
 @click.option("--theme", default="editorial", show_default=True, type=click.Choice(["editorial", "academic", "nature", "presentation_dark", "dark_transparent", "knime_enhanced"]))
 @click.option("--format", "fmt", default="png", show_default=True, type=click.Choice(["png", "svg", "pdf"]))
 @click.option("--dpi", default=300, show_default=True, type=int)
+@click.option("--no-watermark", is_flag=True, help="Disable the bottom-right GitHub footer watermark.")
 @click.option("--json", "as_json", is_flag=True, help="Output structured JSON.")
 def cmd_custom(
     workflow_path: str,
@@ -234,6 +241,7 @@ def cmd_custom(
     theme: str,
     fmt: str,
     dpi: int,
+    no_watermark: bool,
     as_json: bool,
 ) -> None:
     """Synthesize a custom chart from ANY executed data node in a KNIME workflow."""
@@ -255,6 +263,7 @@ def cmd_custom(
             "theme": theme,
             "fmt": fmt,
             "dpi": dpi,
+            "watermark": not no_watermark,
         },
     )
     _emit(res, as_json)

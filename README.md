@@ -146,6 +146,9 @@ knime-viz render-node path/to/workflow_EXECUTED.knwf 13 -o ./temp_vs_demand.svg 
 # Synthesize a brand-new chart from ANY executed data node (#4) — even without a KNIME chart node
 knime-viz custom path/to/workflow_EXECUTED.knwf 4 --kind correlation --value cnt -o ./correlations.png --theme editorial
 
+# Render without the subtle bottom-right GitHub footer watermark
+knime-viz render path/to/workflow_EXECUTED.knwf -o ./out_clean --theme academic --no-watermark
+
 # JSON output mode for shell-based AI coding agents
 knime-viz inspect path/to/workflow_EXECUTED.knwf --json
 ```

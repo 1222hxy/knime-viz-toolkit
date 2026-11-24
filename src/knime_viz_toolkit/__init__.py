@@ -36,11 +36,20 @@ def render_workflow(
     dpi: int = 300,
     enhance: bool = True,
     include_analytics: bool = True,
+    watermark: bool = True,
+    watermark_text: str = "1222hxy/knime-viz-toolkit",
 ) -> list[RenderResult]:
     """One-line helper: read a KNIME workflow and render every detected chart to `output_dir`."""
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
-    opts = RenderOptions(theme=theme, fmt=fmt, dpi=dpi, enhance=enhance)  # type: ignore[arg-type]
+    opts = RenderOptions(
+        theme=theme,
+        fmt=fmt,  # type: ignore[arg-type]
+        dpi=dpi,
+        enhance=enhance,
+        watermark=watermark,
+        watermark_text=watermark_text,
+    )
     results: list[RenderResult] = []
     with KnimeWorkflow(workflow_path) as wf:
         specs = extract_all_specs(wf, include_analytics=include_analytics)
@@ -58,6 +67,8 @@ def render_node(
     dpi: int = 300,
     enhance: bool = True,
     title_override: str | None = None,
+    watermark: bool = True,
+    watermark_text: str = "1222hxy/knime-viz-toolkit",
 ) -> RenderResult:
     """One-line helper: render a single KNIME visualization node to `output_path`."""
     opts = RenderOptions(
@@ -66,6 +77,8 @@ def render_node(
         dpi=dpi,
         enhance=enhance,
         title_override=title_override,
+        watermark=watermark,
+        watermark_text=watermark_text,
     )
     with KnimeWorkflow(workflow_path) as wf:
         spec = extract_node_chart_spec(wf, node_id)

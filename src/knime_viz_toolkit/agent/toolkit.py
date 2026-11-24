@@ -343,6 +343,7 @@ class KnimeVizAgentToolkit:
                 subtitle_override=inp.subtitle_override,
                 x_label_override=inp.x_label_override,
                 y_label_override=inp.y_label_override,
+                watermark=inp.watermark,
             )
             res = render_chart_spec(wf, spec, inp.output_path, opts)
             payload = res.model_dump()
@@ -362,7 +363,9 @@ class KnimeVizAgentToolkit:
                 wanted = set(inp.node_ids)
                 specs = [s for s in specs if s.node_id in wanted]
 
-            opts = RenderOptions(theme=inp.theme, dpi=inp.dpi, fmt=inp.fmt, enhance=inp.enhance)
+            opts = RenderOptions(
+                theme=inp.theme, dpi=inp.dpi, fmt=inp.fmt, enhance=inp.enhance, watermark=inp.watermark
+            )
             rendered: list[dict[str, Any]] = []
             errors: list[dict[str, Any]] = []
 
@@ -412,7 +415,9 @@ class KnimeVizAgentToolkit:
                 bar_mode=inp.bar_mode,
                 donut=inp.donut,
             )
-            opts = RenderOptions(theme=inp.theme, dpi=inp.dpi, fmt=inp.fmt, enhance=inp.enhance)
+            opts = RenderOptions(
+                theme=inp.theme, dpi=inp.dpi, fmt=inp.fmt, enhance=inp.enhance, watermark=inp.watermark
+            )
             res = render_chart_spec(wf, spec, inp.output_path, opts)
             payload = res.model_dump()
             if inp.include_base64 and inp.fmt == "png":

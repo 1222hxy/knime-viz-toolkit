@@ -71,6 +71,7 @@ def create_mcp_server() -> Any:
         subtitle_override: str | None = None,
         x_label_override: str | None = None,
         y_label_override: str | None = None,
+        watermark: bool = True,
     ) -> str:
         """Render a specific KNIME visualization or analytics node into a high-DPI publication chart."""
         args = {
@@ -85,6 +86,7 @@ def create_mcp_server() -> Any:
             "subtitle_override": subtitle_override,
             "x_label_override": x_label_override,
             "y_label_override": y_label_override,
+            "watermark": watermark,
         }
         return json.dumps(toolkit.call_tool("render_node_chart", args), ensure_ascii=False, indent=2)
 
@@ -98,6 +100,7 @@ def create_mcp_server() -> Any:
         enhance: bool = True,
         include_analytics: bool = True,
         node_ids: list[int] | None = None,
+        watermark: bool = True,
     ) -> str:
         """Batch-render every visualization and analytics node in a KNIME workflow into high-DPI charts."""
         args = {
@@ -109,6 +112,7 @@ def create_mcp_server() -> Any:
             "enhance": enhance,
             "include_analytics": include_analytics,
             "node_ids": node_ids,
+            "watermark": watermark,
         }
         return json.dumps(toolkit.call_tool("render_workflow_charts", args), ensure_ascii=False, indent=2)
 
@@ -130,6 +134,7 @@ def create_mcp_server() -> Any:
         fmt: Literal["png", "svg", "pdf"] = "png",
         dpi: int = 300,
         enhance: bool = True,
+        watermark: bool = True,
     ) -> str:
         """Synthesize a custom publication chart from ANY executed KNIME data node."""
         args = {
@@ -149,6 +154,7 @@ def create_mcp_server() -> Any:
             "fmt": fmt,
             "dpi": dpi,
             "enhance": enhance,
+            "watermark": watermark,
         }
         return json.dumps(toolkit.call_tool("render_custom_chart", args), ensure_ascii=False, indent=2)
 
